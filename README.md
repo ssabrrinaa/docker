@@ -93,7 +93,8 @@ sudo systemctl restart docker
 
 docker run -d -p 127.0.0.1:8893:80 --name rbm-dkr-06-global nginx:stable
 
-## DKR 07
+## DKR 07 +
+
 docker pull nginx:stable-alpine
 
 docker tag nginx:stable-alpine nginx:rbm-dkr-07
@@ -103,3 +104,34 @@ docker images
 docker run -d --name rbm-dkr-07 nginx:rbm-dkr-07
 
 docker ps
+
+
+## DKR 08 
+
+# Используем базовый образ nginx:stable
+FROM nginx:stable
+
+# Копируем скачанный конфигурационный файл внутрь контейнера
+COPY nginx.conf /etc/nginx/nginx.conf
+
+
+
+
+# Сборка образа с тегом rbm-dkr-08
+docker build -t nginx:rbm-dkr-08 .
+
+# Вывод списка образов на хосте
+docker images
+
+# Запуск контейнера в фоновом режиме, слушающего на 127.0.0.1:8900
+docker run -d -p 127.0.0.1:8900:80 --name nginx-container nginx:rbm-dkr-08
+
+# Вывод списка запущенных контейнеров
+docker ps
+
+
+
+# Проверка работы контейнера
+curl 127.0.0.1:8900
+
+
