@@ -77,6 +77,9 @@ curl --silent http://127.0.0.1:8892 > /dev/null
 
 docker inspect rbm-dkr-06-local
 
+cat /var/lib/docker/containers/$(docker ps -q --filter "name=rbm-dkr-06-local")/$(docker ps -q --filter "name=rbm-dkr-06-local")-json.log
+
+
 sudo nano /etc/docker/daemon.json
 
 {
