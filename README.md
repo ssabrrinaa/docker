@@ -40,7 +40,7 @@ docker exec rbm-dkr-03 nginx -s reload
 
 docker volume create rbm-dkr-04-volume
 
-docker run -d--name rbm-dkr-04 -p 127.0.0.1:8891:80-v rbm-dkr-04-volume:/var/log/nginx/external-v $(pwd)/nginx.conf:/etc/nginx/nginx.conf:ronginx:stable
+docker run -d--name rbm-dkr-04 -p 127.0.0.1:8891:80 -v rbm-dkr-04-volume:/var/log/nginx/external-v $(pwd)/nginx.conf:/etc/nginx/nginx.conf:ronginx:stable
   
 curl 127.0.0.1:8891
 
@@ -106,14 +106,12 @@ docker run -d --name rbm-dkr-07 nginx:rbm-dkr-07
 docker ps
 
 
-## DKR 08 
-
-Используем базовый образ nginx:stable
+## DKR 08 +
 ```
+// Используем базовый образ nginx:stable
 FROM nginx:stable
-```
-Копируем скачанный конфигурационный файл внутрь контейнера
-```
+
+// Копируем скачанный конфигурационный файл внутрь контейнера
 COPY nginx.conf /etc/nginx/nginx.conf
 ```
 
@@ -141,5 +139,41 @@ docker ps
 Проверка работы контейнера
 ```
 curl 127.0.0.1:8900
+```
+
+## DKR 09 +
+
+```
+# Используем базовый образ ubuntu:18.04
+FROM ubuntu:18.04
+
+# Устанавливаем пакет nginx
+RUN apt-get update && \
+    apt-get install -y nginx
+
+# Копируем конфигурационный файл nginx
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Устанавливаем основную рабочую директорию
+WORKDIR /etc/nginx/
+
+# Определяем Volume
+VOLUME /var/lib/nginx
+
+# Устанавливаем точку входа
+ENTRYPOINT ["nginx"]
+
+# Определяем параметры CMD, как в образе nginx:stable
+CMD ["-g", "daemon off;"]
+```
+
+
+```
+docker build -t nginx:rbm-dkr-09 .
+
+```
+
+```
+docker run -d -p 127.0.0.1:8901:80 --name nginx-container nginx:rbm-dkr-09
 ```
 
