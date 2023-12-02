@@ -68,7 +68,7 @@ docker rm $(docker ps -aq)
 
 
 
-## DKR 06
+## DKR 06 +?
 
 
 docker run -d -p 127.0.0.1:8892:80 --name rbm-dkr-06-local --log-driver local --log-opt max-size=10mb nginx:stable
@@ -92,3 +92,14 @@ sudo nano /etc/docker/daemon.json
 sudo systemctl restart docker
 
 docker run -d -p 127.0.0.1:8893:80 --name rbm-dkr-06-global nginx:stable
+
+## DKR 07
+docker pull nginx:stable-alpine
+
+docker tag nginx:stable-alpine nginx:rbm-dkr-07
+
+docker images
+
+docker run -d --name rbm-dkr-07 nginx:rbm-dkr-07
+
+docker ps
