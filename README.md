@@ -74,3 +74,18 @@ docker rm $(docker ps -aq)
 docker run -d -p 127.0.0.1:8892:80 --name rbm-dkr-06-local --log-driver local --log-opt max-size=10mb nginx:stable
 
 curl --silent http://127.0.0.1:8892 > /dev/null
+
+docker inspect rbm-dkr-06-local
+
+sudo nano /etc/docker/daemon.json
+
+{
+  "log-driver": "local",
+  "log-opts": {
+    "max-size": "10m"
+  }
+}
+
+sudo systemctl restart docker
+
+docker run -d -p 127.0.0.1:8893:80 --name rbm-dkr-06-global nginx:stable
