@@ -5,16 +5,35 @@ Docker
 
 ## DKR-2 +
 
-docker run -d -p 127.0.0.1:8889:80 --name rbm-dkr-02 -v $(pwd)/data:/internal nginx:stable
+docker run -d -p 127.0.0.1:8889:80 --name rbm-dkr-02 -v $(pwd)/
+
+data:/internal nginx:stable
+
 docker exec -it rbm-dkr-02 bash
+
 mv nginx.conf /etc/nginx
+
 docker exec -it rbm-dkr-02 nginx -s reload
+
 curl http://127.0.0.1:8889
+
 docker exec -ti rbm-dkr-02 md5sum /etc/nginx/nginx.conf
 
 
-## DKR-3 
-Но
+## DKR-3 +
+
+
+docker run -d -p 127.0.0.1:8890:80 --name rbm-dkr-03 -v /home/user/nginx.conf:/etc/nginx/nginx.conf nginx:stable
+
+md5sum nginx.conf
+
+docker exec -it rbm-dkr-03 md5sum /etc/nginx/nginx.conf
+
+nano updnginx.conf
+
+cp updnginx.conf nginx.conf
+
+docker exec rbm-dkr-03 nginx -s reload
 
 
 ## DKR-4 +
@@ -51,4 +70,7 @@ docker rm $(docker ps -aq)
 
 ## DKR 06
 
-docker run -d --name web --log-driver json-file -p 8080:80 nginx
+
+docker run -d -p 127.0.0.1:8892:80 --name rbm-dkr-06-local --log-driver local --log-opt max-size=10mb nginx:stable
+
+curl --silent http://127.0.0.1:8892 > /dev/null
