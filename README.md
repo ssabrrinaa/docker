@@ -177,3 +177,41 @@ docker build -t nginx:rbm-dkr-09 .
 docker run -d -p 127.0.0.1:8901:80 --name nginx-container nginx:rbm-dkr-09
 ```
 
+## DKR-10 +
+
+```
+# Используем базовый образ nginx с параметризуемой версией
+ARG NG_VERSION
+FROM nginx:${NG_VERSION}
+
+# Устанавливаем переменную окружения с именем NG_VERSION
+ENV NG_VERSION=${NG_VERSION}
+
+# Создаем файл /opt/$ARG_FILE
+ARG ARG_FILE
+RUN touch "/opt/${ARG_FILE}"
+
+# Передача аргумента для переменной окружения REBRAINME
+ENV REBRAINME=DKR10
+
+```
+
+```
+docker build -t nginx:rbm-dkr-10 --build-arg NG_VERSION=1.21.3 --build-arg ARG_FILE=myfile -f /home/user/Dockerfile /home/user
+```
+
+```
+docker run -d --name rbm-dkr-10 -e REBRAINME=DKR10 nginx:rbm-dkr-10
+```
+
+
+Выведем переменные окружения внутри контейнера:
+```
+docker exec rbm-dkr-10 env
+```
+
+
+Выведем список файлов в директории /opt/ внутри контейнера:
+```
+docker exec rbm-dkr-10 ls /opt/
+```
