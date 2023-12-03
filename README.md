@@ -177,7 +177,7 @@ docker build -t nginx:rbm-dkr-09 .
 docker run -d -p 127.0.0.1:8901:80 --name nginx-container nginx:rbm-dkr-09
 ```
 
-## DKR-10 +
+## DKR-10 
 
 ```
 # Используем базовый образ nginx с параметризуемой версией
@@ -215,3 +215,79 @@ docker exec rbm-dkr-10 env
 ```
 docker exec rbm-dkr-10 ls /opt/
 ```
+
+## DKR-11 
+
+```
+dd if=/dev/zero of=./testfile bs=1M count=10
+```
+
+Dockerfile 
+
+```
+FROM ubuntu:20.04
+ENV testenv1=env1
+#создадим пользователя
+RUN groupadd --gid 2000 user && useradd --uid 2000 --gid 2000 --shell /bin/bash --create-home user
+#посмотрим состояние кэша apt до установки nginx
+RUN ls -lah /var/lib/apt/lists/
+RUN apt-get update -y && apt-get install nginx -y
+#Повторно проверим состояние кэша apt
+RUN ls -lah /var/lib/apt/lists/
+#Очистим кзш
+RUN rm -rf /var/lib/apt/lists/*
+RUN ls -lah /var/lib/apt/lists/
+#Скопируем наш тестовый файл
+COPY testfile .
+#Сменим права
+RUN chown user:user testfile
+USER user
+CMD ["sleep infinity"]
+```
+
+
+```
+docker build -t rbm-dkr-11:default --network=host .
+```
+
+```
+docker inspect rbm-dkr-11:default
+```
+
+
+```
+docker history rbm-dkr-11:default --no-trunc
+```
+
+4.1) Убедитесь, что у всех слоев есть размер.
+4.2) Три директивы, создающие слои: RUN, COPY, и ADD.
+4.3) Размер добавленный директивой RUN chown user:user testfile можно увидеть в выводе команды docker history.
+4.4) Размер образа можно узнать с помощью docker images.
+
+```
+FROM ubuntu:20.04
+ENV testenv1=env1
+#создадим пользователя
+RUN groupadd --gid 2000 user && useradd --uid 2000 --gid 2000 --shell /bin/bash --create-home user
+#посмотрим состояние кэша apt до установки nginx
+RUN ls -lah /var/lib/apt/lists/
+RUN apt-get update -y && apt-get install nginx -y && rm -rf /var/lib/apt/lists/*
+#Повторно проверим состояние кэша apt
+RUN ls -lah /var/lib/apt/lists/
+#Очистим кэш
+RUN rm -rf /var/lib/apt/lists/*
+RUN ls -lah /var/lib/apt/lists/
+#Скопируем наш тестовый файл и назначим пользователя user владельцем
+COPY --chown=user:user testfile .
+USER user
+CMD ["sleep", "infinity"]
+```
+
+```
+docker build -t rbm-dkr-11:optimized .
+```
+
+```
+docker history rbm-dkr-11:optimized --no-trunc
+```
+
