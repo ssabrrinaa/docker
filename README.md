@@ -3,6 +3,7 @@ Docker
 ## DKR-1 +
 
 
+
 ## DKR-2 +
 
 docker run -d -p 127.0.0.1:8889:80 --name rbm-dkr-02 -v $(pwd)/
@@ -231,12 +232,7 @@ ENV testenv1=env1
 RUN groupadd --gid 2000 user && useradd --uid 2000 --gid 2000 --shell /bin/bash --create-home user
 #посмотрим состояние кэша apt до установки nginx
 RUN ls -lah /var/lib/apt/lists/
-RUN apt-get update -y && apt-get install nginx -y
-#Повторно проверим состояние кэша apt
-RUN ls -lah /var/lib/apt/lists/
-#Очистим кзш
-RUN rm -rf /var/lib/apt/lists/*
-RUN ls -lah /var/lib/apt/lists/
+RUN apt-get update -y && apt-get install nginGO111MODULE
 #Скопируем наш тестовый файл
 COPY testfile .
 #Сменим права
@@ -304,19 +300,9 @@ docker pull nginx:stable-alpine
 docker tag nginx:stable-alpine nginx:rbm-dkr-12
 ```
 
-Вывод списка образов
-```
-docker images
-```
-
 Удаление образа nginx:stable-alpine
 ```
 docker rmi nginx:stable-alpine
-```
-
-Вывод списка образов (переименованный образ все еще должен быть в списке)
-```
-docker images
 ```
 
 Повторная загрузка образа nginx:stable-alpine
@@ -334,11 +320,6 @@ docker images | tee /home/user/images.txt
 docker images | grep nginx | awk '{print $3}' | xargs docker rmi
 ```
 
-Вывод списка образов после удаления
-```
-docker images
-```
-
 Запуск контейнера в фоне с именем rbm-dkr-12
 ```
 docker run -d --name rbm-dkr-12 nginx:stable-alpine
@@ -354,20 +335,12 @@ docker rmi nginx:stable-alpine
 docker rmi --force nginx:stable-alpine
 ```
 
-Вывод списка запущенных контейнеров (контейнер должен продолжать работать)
-```
-docker ps
-```
 
 Перезапуск контейнера
 ```
 docker restart rbm-dkr-12
 ```
 
-Вывод списка запущенных контейнеров (контейнер должен работать)
-```
-docker ps
-```
 
 ## DKR-13 
 Dockerfile
@@ -397,7 +370,7 @@ time docker build --no-cache -t cache:2 .
 time docker build --no-cache -t cache:3 --build-arg MYARG=3 .
 ```
 
-овторная сборка образа с использованием кэша
+Повторная сборка образа с использованием кэша
 ```
 time docker build -t cache:3 --build-arg MYARG=3 .
 ```
@@ -415,3 +388,39 @@ docker inspect --format='{{index .Config.Labels "MYARG"}}' cache:4
 ```
 docker image history cache:1
 ```
+
+
+## DKR-14
+
+
+Dockerfile
+```
+# Multi-stage build
+FROM golang:1.19-alpine AS builder
+
+WORKDIR /app
+COPY main.go .
+ENV GO111MODULE auto
+
+RUN go mod init main && \
+    go mod tidy && \
+    go build -o app
+
+# Execution stage
+FROM alpine:3.10.3
+
+WORKDIR /app
+COPY --from=builder /app/app .
+
+CMD ["./app"]
+```
+
+```
+docker build -t dkr-14-gocalc .
+```
+
+
+```
+docker history dkr-14-gocalc
+```
+
