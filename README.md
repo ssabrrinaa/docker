@@ -291,7 +291,7 @@ docker build -t rbm-dkr-11:optimized .
 docker history rbm-dkr-11:optimized --no-trunc
 ```
 
-## DKR-12 
+## DKR-12 +
 
 
 Загрузка образа nginx:stable-alpine
@@ -367,4 +367,51 @@ docker restart rbm-dkr-12
 Вывод списка запущенных контейнеров (контейнер должен работать)
 ```
 docker ps
+```
+
+## DKR-13 
+Dockerfile
+```
+FROM alpine:latest
+ARG MYARG
+RUN apk update && apk add build-base
+```
+
+Сборка образа с именем cache:1
+
+```
+time docker build -t cache:1 .
+```
+
+Сборка образа с именем cache:2
+```
+time docker build -t cache:2 .
+```
+
+```
+time docker build --no-cache -t cache:2 .  
+```
+
+Сборка образа без использования кэша
+```
+time docker build --no-cache -t cache:3 --build-arg MYARG=3 .
+```
+
+овторная сборка образа с использованием кэша
+```
+time docker build -t cache:3 --build-arg MYARG=3 .
+```
+
+Сборка образа с именем cache:4 и новым значением MYARG
+```
+time docker build -t cache:4 --build-arg MYARG=4 .
+```
+
+Использование docker inspect для поиска аргумента MYARG
+```
+docker inspect --format='{{index .Config.Labels "MYARG"}}' cache:4
+```
+
+```
+docker image history cache:1
 ```
