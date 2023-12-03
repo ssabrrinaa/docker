@@ -216,7 +216,7 @@ docker exec rbm-dkr-10 env
 docker exec rbm-dkr-10 ls /opt/
 ```
 
-## DKR-11 
+## DKR-11 +
 
 ```
 dd if=/dev/zero of=./testfile bs=1M count=10
@@ -291,3 +291,80 @@ docker build -t rbm-dkr-11:optimized .
 docker history rbm-dkr-11:optimized --no-trunc
 ```
 
+## DKR-12 
+
+
+Загрузка образа nginx:stable-alpine
+```
+docker pull nginx:stable-alpine
+```
+
+Добавление нового тега к образу
+```
+docker tag nginx:stable-alpine nginx:rbm-dkr-12
+```
+
+Вывод списка образов
+```
+docker images
+```
+
+Удаление образа nginx:stable-alpine
+```
+docker rmi nginx:stable-alpine
+```
+
+Вывод списка образов (переименованный образ все еще должен быть в списке)
+```
+docker images
+```
+
+Повторная загрузка образа nginx:stable-alpine
+```
+docker pull nginx:stable-alpine
+```
+
+Вывод списка образов и сохранение в файл
+```
+docker images | tee /home/user/images.txt
+```
+
+Удаление всех образов nginx одной командой
+```
+docker images | grep nginx | awk '{print $3}' | xargs docker rmi
+```
+
+Вывод списка образов после удаления
+```
+docker images
+```
+
+Запуск контейнера в фоне с именем rbm-dkr-12
+```
+docker run -d --name rbm-dkr-12 nginx:stable-alpine
+```
+
+Попытка удалить образ nginx:stable-alpine без флагов
+```
+docker rmi nginx:stable-alpine
+```
+
+Удаление образа nginx:stable-alpine с флагом --force
+```
+docker rmi --force nginx:stable-alpine
+```
+
+Вывод списка запущенных контейнеров (контейнер должен продолжать работать)
+```
+docker ps
+```
+
+Перезапуск контейнера
+```
+docker restart rbm-dkr-12
+```
+
+Вывод списка запущенных контейнеров (контейнер должен работать)
+```
+docker ps
+```
