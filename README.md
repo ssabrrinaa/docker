@@ -425,7 +425,7 @@ docker history dkr-14-gocalc
 ```
 
 
-## DKR-15 +
+## DKR-15 
 
 Dockerfile 
 ```
