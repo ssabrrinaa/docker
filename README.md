@@ -342,7 +342,7 @@ docker restart rbm-dkr-12
 ```
 
 
-## DKR-13 
+## DKR-13 +
 Dockerfile
 ```
 FROM alpine:latest
@@ -390,7 +390,7 @@ docker image history cache:1
 ```
 
 
-## DKR-14
+## DKR-14 +
 
 
 Dockerfile
@@ -423,4 +423,30 @@ docker build -t dkr-14-gocalc .
 ```
 docker history dkr-14-gocalc
 ```
+
+
+## DKR-15 +
+
+Dockerfile 
+```
+FROM golang:1.19-alpine
+WORKDIR /build
+COPY main.go .
+ENV GO111MODULE auto
+RUN go mod init main && \
+    go mod tidy && \
+    go build -o app
+FROM alpine:3.10.3
+COPY --from=0 /build/app /app
+ARG SECRET
+RUN echo $SECRET > /secret.txt
+CMD ["/app"]
+```
+
+```
+docker build --build-arg SECRET=verySecret -t gocalc .
+```
+
+## DKR-16 -
+
 
